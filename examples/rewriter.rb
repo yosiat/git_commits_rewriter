@@ -1,4 +1,4 @@
-require '../lib/git_commits_rewriter'
+require 'git_commits_rewriter'
 
 repository = "/Users/yosy/repos/test"
 

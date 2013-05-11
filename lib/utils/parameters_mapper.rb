@@ -1,10 +1,11 @@
 module ParametersMapper
-  def self.map source, response
-      response = mapping.map do |key, value|
-        [ soruce[key.to_s], value ]
+  def self.map source, mapping
+      mapped_source = source.map do |key, value|
+        [ mapping[key.to_s], value ]
       end 
 
-      response = Hash[mapping]
+      mapped_source = Hash[mapped_source]
+      mapped_source
   end
 end
 
