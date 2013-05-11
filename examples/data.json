@@ -1,0 +1,13 @@
+{
+  "url" : "http://localhost:4567/author_provider",
+  "method" : "GET",
+  "params" : {
+    "author_name" : "name",
+    "author_email" : "email"
+  },
+  "response" : {
+    "username" : "author_name",
+    "email" : "author_email"
+  }
+}
+
