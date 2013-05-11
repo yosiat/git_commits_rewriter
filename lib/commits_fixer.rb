@@ -1,6 +1,8 @@
 require "json"
-require_relative "git_filter_enviroment"
 require "typhoeus"
+
+require_relative "git_filter_enviroment"
+require_relative "utils/parameters_mapper"
 
 class CommitsFilter
 
@@ -11,26 +13,33 @@ class CommitsFilter
 
   def start!
     # Send a request
-    mapping = send_request
+    response = send_request
 
 
-
-    # Apply mapping if we have..
+    # Apply response if we have..
     if @provider_config.has_key? "response"
-      mapping = mapping.map do |key, value|
-        [ @provider_config["response"][key.to_s], value ]
-      end 
-
-      mapping = Hash[mapping]
+      response = ParametersMapper.map(response, @provider_config["response"])
     end
 
     # Create new configuration..
     commit_info = {
-      :GIT_AUTHOR_NAME => mapping["author_name"],
-      :GIT_AUTHOR_EMAIL => mapping["author_email"]
+      :GIT_AUTHOR_NAME => response["author_name"],
+      :GIT_AUTHOR_EMAIL => response["author_email"]
     }
 
     GitFilterEnviroment.update_commits_info commit_info
+  end
+
+
+  def self.init_from_arguments
+    # load the configuration file
+    file_name = ARGV.shift
+    json = File.open(file_name).readlines("").first
+
+    # Parse the config file
+    provider_config = JSON.parse(json)
+
+    CommitsFilter.new(provider_config, GitFilterEnviroment.get_commits_info)
   end
 
 private
@@ -49,7 +58,6 @@ private
   end
 
 
-
   def build_params
     # get the params by the commits info
     params = {
@@ -59,39 +67,14 @@ private
 
     # does the user wants to map the params to other names?
     if @provider_config.has_key? "params"
-      # Remap the array according to the provider config
-      params  = params.map do |key,value|
-        [ @provider_config["params"][key.to_s], value ]
-      end
-
-      # params now will be an hash, convert to hash
-      params = Hash[params]
+      params = ParametersMapper.map(params, @provider_config["params"])
     end
 
     params
   end 
-
 end
 
 
-# load the configuration file
-file_name = ARGV.shift
-json = File.open(file_name).readlines("").first
-
-
-provider_config = JSON.parse(json)
-commits_filter = CommitsFilter.new(provider_config, GitFilterEnviroment.get_commits_info)
-
+commits_filter = CommitsFilter.init_from_arguments
 commits_filter.start! 
-
-
-
-
-
-
-
-
-
-
-
 

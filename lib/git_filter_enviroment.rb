@@ -2,8 +2,6 @@ module GitFilterEnviroment
   
   def self.get_commits_info
     {
-      :GIT_COMMITER_NAME => ENV["GIT_COMMITTER_NAME"],
-      :GIT_COMMITER_EMAIL => ENV["GIT_COMMITTER_EMAIL"],
       :GIT_AUTHOR_NAME => ENV["GIT_AUTHOR_NAME"],
       :GIT_AUTHOR_EMAIL => ENV["GIT_AUTHOR_EMAIL"]
     }
@@ -14,6 +12,7 @@ module GitFilterEnviroment
   def self.export key, value
     puts "export #{key}=#{value}"
   end
+
 
   def self.update_commits_info info
     info.each do |key, value|
